@@ -13,7 +13,7 @@ public class Database {
 	EntityManager em;
 
 	public Database() {
-		EntityManagerFactory factory = Persistence.createEntityManagerFactory("refactoringDB");
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("lambda-study");
 		em = factory.createEntityManager();
 	}
 

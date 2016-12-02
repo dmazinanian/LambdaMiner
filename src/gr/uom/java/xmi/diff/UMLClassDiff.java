@@ -5,11 +5,14 @@ import gr.uom.java.xmi.UMLClass;
 import gr.uom.java.xmi.UMLOperation;
 import gr.uom.java.xmi.UMLParameter;
 import gr.uom.java.xmi.UMLType;
+import gr.uom.java.xmi.decomposition.Lambda;
 import gr.uom.java.xmi.decomposition.OperationInvocation;
 import gr.uom.java.xmi.decomposition.UMLOperationBodyMapper;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,6 +43,7 @@ public class UMLClassDiff implements Comparable<UMLClassDiff> {
 	private boolean superclassChanged;
 	private UMLType oldSuperclass;
 	private UMLType newSuperclass;
+	private List<Lambda> addedLambdas;
 	
 	public UMLClassDiff(UMLClass originalClass) {
 		this.originalClass = originalClass;
@@ -56,6 +60,7 @@ public class UMLClassDiff implements Comparable<UMLClassDiff> {
 		this.visibilityChanged = false;
 		this.abstractionChanged = false;
 		this.superclassChanged = false;
+		this.addedLambdas = new ArrayList<>();
 	}
 
 	public String getClassName() {
@@ -533,5 +538,53 @@ public class UMLClassDiff implements Comparable<UMLClassDiff> {
 
 	public int compareTo(UMLClassDiff classDiff) {
 		return this.className.compareTo(classDiff.className);
+	}
+
+	public void checkForLambdas() {
+		for (UMLOperationBodyMapper umlOperationBodyMapper : operationBodyMapperList) {
+			List<Lambda> lambdasBefore = umlOperationBodyMapper.getOperation1().getLambdas();
+			List<Lambda> lambdasAfter = umlOperationBodyMapper.getOperation2().getLambdas();
+			addedLambdas.addAll(compareLambdasToDetectAddedLambdas(lambdasBefore, lambdasAfter));
+			
+		}
+		for (UMLOperationDiff umlOperationDiff : operationDiffList) {
+			List<Lambda> lambdasBefore = umlOperationDiff.getRemovedOperation().getLambdas();
+			List<Lambda> lambdasAfter = umlOperationDiff.getAddedOperation().getLambdas();
+			addedLambdas.addAll(compareLambdasToDetectAddedLambdas(lambdasBefore, lambdasAfter));
+		}
+		for (UMLOperation umlOperation : addedOperations) {
+			addedLambdas.addAll(umlOperation.getLambdas());
+		}
+	}
+
+	private Collection<? extends Lambda> compareLambdasToDetectAddedLambdas(List<Lambda> lambdasBefore, List<Lambda> lambdasAfter) {
+		Set<Lambda> matchedLambdasAfter = new HashSet<>(lambdasAfter);
+		Set<Lambda> matchedLambdasBefore = new HashSet<>(lambdasBefore);
+		matchedLambdasAfter.retainAll(lambdasBefore); // Remove everything which is not matched
+		matchedLambdasBefore.retainAll(lambdasAfter);
+		for (Lambda lambdaAfter : lambdasAfter) {
+			if (!matchedLambdasAfter.contains(lambdaAfter)) {
+				for (Lambda lambdaBefore : lambdasBefore) {
+					if (!matchedLambdasBefore.contains(lambdaBefore)) {
+						if (lambdaAfter.getFunctionalInterfaceType().equals(lambdaBefore.getFunctionalInterfaceType())) {
+							matchedLambdasAfter.add(lambdaAfter);
+							matchedLambdasBefore.add(lambdaBefore);
+							break;
+						}
+					}
+				}
+			}
+		}
+		List<Lambda> detectedAddedLambdas = new ArrayList<>(lambdasAfter);
+		detectedAddedLambdas.removeAll(matchedLambdasAfter);
+		return detectedAddedLambdas;
+	}
+	
+	/*private boolean hasTheSameParameterTypes(Lambda lambda1, Lambda lambda2) {
+		return lambda1.getParameters().keySet().equals(lambda2.getParameters().keySet());
+	}*/
+
+	public List<Lambda> getAddedLambdas() {
+		return addedLambdas;
 	}
 }

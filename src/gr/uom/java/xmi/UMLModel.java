@@ -163,6 +163,8 @@ public class UMLModel {
 //    	}
     	modelDiff.checkForOperationMoves();
     	modelDiff.checkForExtractedAndMovedOperations();
+    	
+    	modelDiff.checkForLambdas();
     	return modelDiff;
     }
 }

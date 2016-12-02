@@ -1,6 +1,7 @@
 package gr.uom.java.xmi;
 
 import gr.uom.java.xmi.decomposition.AbstractStatement;
+import gr.uom.java.xmi.decomposition.Lambda;
 import gr.uom.java.xmi.decomposition.OperationBody;
 import gr.uom.java.xmi.decomposition.OperationInvocation;
 import gr.uom.java.xmi.decomposition.StatementObject;
@@ -319,4 +320,8 @@ public class UMLOperation implements Comparable<UMLOperation>, Serializable {
 	      return this.equalReturnParameter(operation) &&
 	    		  (this.getParameters().containsAll(operation.getParameters()) || operation.getParameters().containsAll(this.getParameters()));
 	   }
+
+	public List<Lambda> getLambdas() {
+		return operationBody.getLambdas();
+	}
 }

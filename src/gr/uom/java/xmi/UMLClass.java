@@ -310,6 +310,7 @@ public class UMLClass implements Comparable<UMLClass>, Serializable {
     	classDiff.checkForExtractedOperations();
     	//classDiff.checkForAttributeRenames();
     	//classDiff.checkForOperationRenames();
+    	classDiff.checkForLambdas();
     	return classDiff;
     }
 

@@ -5,9 +5,9 @@ import java.util.Date;
 import br.ufmg.dcc.labsoft.refactoringanalyzer.dao.Database;
 import br.ufmg.dcc.labsoft.refactoringanalyzer.dao.ProjectGit;
 
-class AnalyzeNewCommitsHandler extends AnalyzeProjectsHandler {
+public class AnalyzeNewCommitsHandler extends AnalyzeProjectsHandler {
 
-	AnalyzeNewCommitsHandler(Database db, ProjectGit project) {
+	public AnalyzeNewCommitsHandler(Database db, ProjectGit project) {
 		super(db, project);
 	}
 

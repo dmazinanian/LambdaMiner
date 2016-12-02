@@ -118,4 +118,17 @@ public class CompositeStatementObject extends AbstractStatement {
 		}
 		return map;
 	}
+
+	public List<Lambda> getLambdas() {
+		List<Lambda> lambdas = new ArrayList<>();
+		for (AbstractExpression abstractExpression : expressionList) {
+			lambdas.addAll(abstractExpression.getLambdas());
+		}
+		for (AbstractStatement abstractStatement : statementList) {
+			lambdas.addAll(abstractStatement.getLambdas());
+		}
+		return lambdas;
+	}
+	
+	
 }

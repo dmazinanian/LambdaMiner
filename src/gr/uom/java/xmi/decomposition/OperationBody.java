@@ -238,4 +238,8 @@ public class OperationBody {
 			parent.addStatement(child);
 		}
 	}
+
+	public List<Lambda> getLambdas() {
+		return compositeStatement.getLambdas();
+	}
 }

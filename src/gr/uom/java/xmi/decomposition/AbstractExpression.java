@@ -12,6 +12,7 @@ public class AbstractExpression extends AbstractCodeFragment {
 	private List<String> variables;
 	private List<VariableDeclaration> variableDeclarations;
 	private Map<String, OperationInvocation> methodInvocationMap;
+	private List<Lambda> lambdas;
     
     public AbstractExpression(Expression expression) {
     	SimpleNameVisitor visitor = new SimpleNameVisitor();
@@ -21,6 +22,7 @@ public class AbstractExpression extends AbstractCodeFragment {
 		this.methodInvocationMap = visitor.getMethodInvocationMap();
     	this.expression = expression.toString();
     	this.owner = null;
+    	this.lambdas = visitor.getLambdas();
     }
 
     public void setOwner(CompositeStatementObject owner) {
@@ -56,5 +58,10 @@ public class AbstractExpression extends AbstractCodeFragment {
 	@Override
 	public Map<String, OperationInvocation> getMethodInvocationMap() {
 		return methodInvocationMap;
+	}
+
+	@Override
+	public List<Lambda> getLambdas() {
+		return lambdas;
 	}
 }

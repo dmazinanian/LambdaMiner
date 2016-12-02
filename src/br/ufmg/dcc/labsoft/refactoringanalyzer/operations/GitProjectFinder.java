@@ -27,12 +27,12 @@ public class GitProjectFinder {
 	public static void main(String[] args) throws IOException {
 		GitProjectFinder gitProjectFinder = new GitProjectFinder();
 		for (int i = 1; i <= 10; i++) {
-			gitProjectFinder.findRepos(i);
+			gitProjectFinder.findRepos(i, args[0], args[1]);
 		}
 	}
 
-	private void findRepos(int page) throws IOException {
-		Github github = new RtGithub("asergufmg", "aserg.ufmg2009");
+	private void findRepos(int page, String username, String password) throws IOException {
+		Github github = new RtGithub(username, password);
 		Request request = github.entry()
 				.uri().path("/search/repositories")
 				.queryParam("q", "language:Java created:<=2014-06-01")

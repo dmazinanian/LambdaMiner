@@ -8,6 +8,7 @@ import gr.uom.java.xmi.UMLOperation;
 import gr.uom.java.xmi.UMLParameter;
 import gr.uom.java.xmi.UMLRealization;
 import gr.uom.java.xmi.UMLType;
+import gr.uom.java.xmi.decomposition.Lambda;
 import gr.uom.java.xmi.decomposition.OperationInvocation;
 import gr.uom.java.xmi.decomposition.UMLOperationBodyMapper;
 
@@ -45,6 +46,8 @@ public class UMLModelDiff {
    private List<UMLAnonymousClass> removedAnonymousClasses;
    private List<Refactoring> refactorings;
    
+   private ArrayList<Lambda> addedLambdas;
+   
    public UMLModelDiff() {
       this.addedClasses = new ArrayList<UMLClass>();
       this.removedClasses = new ArrayList<UMLClass>();
@@ -63,6 +66,8 @@ public class UMLModelDiff {
 //      this.addedAnonymousClasses = new ArrayList<UMLAnonymousClass>();
       this.removedAnonymousClasses = new ArrayList<UMLAnonymousClass>();
       this.refactorings = new ArrayList<Refactoring>();
+      
+      this.addedLambdas = new ArrayList<>();
    }
 
    public void reportAddedClass(UMLClass umlClass) {
@@ -877,6 +882,25 @@ public class UMLModelDiff {
       classDiff.getAddedOperations().remove(operation);
    }
    
+	public void checkForLambdas() {
+		/* The new lambda is most probably in an existing method,
+		 * or in a new method, which could be in a new class.
+		 */
+		for (UMLClassDiff umlClassDiff : commonClassDiffList) {
+			// Added new lambdas in existing classes. They could be in existing or added methods
+			addedLambdas.addAll(umlClassDiff.getAddedLambdas());
+		}
+		for (UMLClass umlClass : addedClasses) {
+			for (UMLOperation umlOperation : umlClass.getOperations()) {
+				addedLambdas.addAll(umlOperation.getLambdas());
+			}
+		}
+	}
+
+	public List<Lambda> getAddedLambdas() {
+		return addedLambdas;
+	}
+	
 // public String toString() {
 //    StringBuilder sb = new StringBuilder();
 //    if(!addedClasses.isEmpty() || !removedClasses.isEmpty() || !classMoveDiffList.isEmpty() || !classRenameDiffList.isEmpty())

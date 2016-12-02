@@ -9,6 +9,7 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
+import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.ParameterizedType;
@@ -27,6 +28,18 @@ public class SimpleNameVisitor extends ASTVisitor {
 	private List<String> types = new ArrayList<String>();
 	private Map<String, OperationInvocation> methodInvocationMap = new LinkedHashMap<String, OperationInvocation>();
 	private List<VariableDeclaration> variableDeclarations = new ArrayList<VariableDeclaration>();
+	private List<Lambda> lambdas = new ArrayList<>();
+	
+	@Override
+	public boolean visit(LambdaExpression node) {
+		Lambda lambda = new Lambda(node);
+		lambdas.add(lambda);
+		return super.visit(node);
+	}
+	
+	public List<Lambda> getLambdas() {
+		return lambdas;
+	}
 	
 	public boolean visit(VariableDeclarationFragment node) {
 		variableDeclarations.add(new VariableDeclaration(node));
