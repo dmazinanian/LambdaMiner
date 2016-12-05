@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -40,6 +41,8 @@ public class LambdaDBEntity extends AbstractEntity {
 	private int endLine;
 	private int endColumn;
 	private int numberOfParameters;
+	
+	@Column(columnDefinition="text")
 	private String body;
 
 	@Override
