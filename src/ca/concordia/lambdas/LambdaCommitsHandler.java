@@ -1,11 +1,15 @@
 package ca.concordia.lambdas;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import br.ufmg.dcc.labsoft.refactoringanalyzer.dao.Database;
+import br.ufmg.dcc.labsoft.refactoringanalyzer.dao.LambdaDBEntity;
 import br.ufmg.dcc.labsoft.refactoringanalyzer.dao.ProjectGit;
+import br.ufmg.dcc.labsoft.refactoringanalyzer.dao.RevisionGit;
 import gr.uom.java.xmi.decomposition.Lambda;
 
 public class LambdaCommitsHandler {
@@ -35,7 +39,12 @@ public class LambdaCommitsHandler {
 	}
 
 	public void handle(RevCommit currentCommit, List<Lambda> lambdasAtRevision) {
-		
+		RevisionGit revisionGit = RevisionGit.getFromRevCommit(currentCommit, db.getProjectById(project.getId()));
+		Set<LambdaDBEntity> lambdas = 
+				lambdasAtRevision.stream()
+				.map(lambda -> LambdaDBEntity.getFromLambda(lambda, revisionGit)).collect(Collectors.toSet());
+		revisionGit.setLambdas(lambdas);
+		db.insert(revisionGit);
 	}
 
 }

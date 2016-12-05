@@ -75,9 +75,10 @@ public class UMLModelASTReader {
 		Map options = JavaCore.getOptions();
 		JavaCore.setComplianceOptions(JavaCore.VERSION_1_8, options);
 		parser.setCompilerOptions(options);
-		parser.setResolveBindings(true);
-		parser.setBindingsRecovery(true);
-		parser.setEnvironment(new String[0], new String[]{srcFolder.getPath()}, null, true);
+		parser.setResolveBindings(false);
+		//parser.setBindingsRecovery(true);
+		// Last param > true for bindings (I guess for the JDK classes)
+		parser.setEnvironment(new String[0], new String[]{srcFolder.getPath()}, null, false); 
 		return parser;
 	}
 

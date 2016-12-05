@@ -70,9 +70,8 @@ public class LambdaMiner {
 		List<String> filesCurrent = new ArrayList<>();
 		Map<String, String> renamedFilesHint = new HashMap<>();
 		gitService.fileTreeDiff(repository, currentCommit, filesBefore, filesCurrent, renamedFilesHint, true);
-		// If no java files changed, there is no refactoring. Also, if there are
-		// only ADD's or only REMOVE's there is no refactoring
-		if (!filesBefore.isEmpty() && !filesCurrent.isEmpty()) {
+		// If no java files changed, there is no Lambdas added
+		if (!filesCurrent.isEmpty()) {
 			// Checkout and build model for current commit
 			gitService.checkout(repository, commitId);
 			UMLModel currentUMLModel = createModel(projectFolder, filesCurrent);
@@ -84,11 +83,11 @@ public class LambdaMiner {
 
 			// Diff between currentModel e parentModel
 			lambdasAtRevision = parentUMLModel.diff(currentUMLModel, renamedFilesHint).getAddedLambdas();
-			if (lambdasAtRevision.size() > 0) {
+			/*if (lambdasAtRevision.size() > 0) {
 				System.out.println(commitId);
 				System.out.println(lambdasAtRevision.toString());
 				System.out.println("_________");
-			}
+			}*/
 			
 			//lambdasAtRevision = filter(lambdasAtRevision);
 

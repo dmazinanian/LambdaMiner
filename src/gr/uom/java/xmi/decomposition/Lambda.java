@@ -3,6 +3,7 @@ package gr.uom.java.xmi.decomposition;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.LambdaExpression;
@@ -14,6 +15,10 @@ public class Lambda {
 	private final String body;
 	private final int offset;
 	private final int length;
+	private final int lineStart;
+	private final int columnStart;
+	private final int lineEnd;
+	private final int columnEnd;
 	private final String functionalInterfaceType;
 	private final List<String> parameterTypes;
 	private final List<String> parameterNames;
@@ -22,6 +27,12 @@ public class Lambda {
 		body = node.getBody().toString();
 		offset = node.getStartPosition();
 		length = node.getLength();
+		CompilationUnit compilationUnit = (CompilationUnit)node.getRoot();
+		lineStart = compilationUnit.getLineNumber(offset);
+		columnStart = compilationUnit.getColumnNumber(offset);
+		int endOffset = offset + length - 1;
+		lineEnd = compilationUnit.getLineNumber(endOffset);
+		columnEnd = compilationUnit.getColumnNumber(endOffset);
 		ITypeBinding lambdaExpressionBinding = node.resolveTypeBinding();
 		if (lambdaExpressionBinding != null) {
 			functionalInterfaceType = lambdaExpressionBinding.getErasure().getQualifiedName();
@@ -60,7 +71,7 @@ public class Lambda {
 		return body;
 	}
 
-	public int getStartPosition() {
+	public int getOffset() {
 		return offset;
 	}
 
@@ -68,6 +79,22 @@ public class Lambda {
 		return length;
 	}
 	
+	public int getLineStart() {
+		return lineStart;
+	}
+
+	public int getColumnStart() {
+		return columnStart;
+	}
+
+	public int getLineEnd() {
+		return lineEnd;
+	}
+
+	public int getColumnEnd() {
+		return columnEnd;
+	}
+
 	public String getFunctionalInterfaceType() {
 		return functionalInterfaceType;
 	}
@@ -108,7 +135,7 @@ public class Lambda {
 		result = prime * result + ((body == null) ? 0 : body.hashCode());
 		result = prime * result + ((functionalInterfaceType == null) ? 0 : functionalInterfaceType.hashCode());
 		result = prime * result + length;
-		result = prime * result + offset;
+		/*result = prime * result + offset;*/
 		result = prime * result + ((parameterNames == null) ? 0 : parameterNames.hashCode());
 		result = prime * result + ((parameterTypes == null) ? 0 : parameterTypes.hashCode());
 		return result;
@@ -135,8 +162,8 @@ public class Lambda {
 			return false;
 		if (length != other.length)
 			return false;
-		if (offset != other.offset)
-			return false;
+		/*if (offset != other.offset)
+			return false;*/
 		if (parameterNames == null) {
 			if (other.parameterNames != null)
 				return false;

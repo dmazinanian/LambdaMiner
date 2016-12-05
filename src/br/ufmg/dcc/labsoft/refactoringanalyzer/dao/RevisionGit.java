@@ -15,6 +15,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.eclipse.jgit.revwalk.RevCommit;
+
 @Entity
 @NamedQueries({
 	@NamedQuery(name = "revisionGit.findByProjectAndCommit", query = "SELECT i FROM RevisionGit i where i.project = :project and i.commitId = :commitId"),
@@ -52,6 +54,9 @@ public class RevisionGit extends AbstractEntity {
 
 	@OneToMany(mappedBy = "revision", targetEntity = RefactoringGit.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Set<RefactoringGit> refactorings;
+	
+	@OneToMany(mappedBy = "revision", targetEntity = LambdaDBEntity.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Set<LambdaDBEntity> lambdas;
 
 	public RevisionGit() {
 	}
@@ -194,6 +199,39 @@ public class RevisionGit extends AbstractEntity {
 
 	public void setOk(Boolean ok) {
 		this.ok = ok;
+	}
+	
+	public void setLambdas(Set<LambdaDBEntity> lambdas) {
+		this.lambdas = lambdas;
+	}
+	
+	public Set<LambdaDBEntity> getLambdas() {
+		return lambdas;
+	}
+
+	public static RevisionGit getFromRevCommit(RevCommit curRevision, ProjectGit project) {
+		RevisionGit revision = new RevisionGit();
+		revision.setProjectGit(project);
+		revision.setIdCommit(curRevision.getId().getName());
+		revision.setAuthorName(curRevision.getAuthorIdent().getName());
+		revision.setAuthorEmail(curRevision.getAuthorIdent().getEmailAddress());
+		revision.setCommitterName(curRevision.getCommitterIdent().getName());
+		revision.setCommitterEmail(curRevision.getCommitterIdent().getEmailAddress());
+		revision.setEncoding(curRevision.getEncoding().name());
+		revision.setIdCommitParent(curRevision.getParent(0).getId().getName());
+		if (curRevision.getShortMessage().length() >= 4999) {
+			revision.setShortMessage(curRevision.getShortMessage().substring(0, 4999));
+		} else {
+			revision.setShortMessage(curRevision.getShortMessage());
+		}
+		String fullMessage = curRevision.getFullMessage();
+		if (fullMessage.length() > 10000) {
+			revision.setFullMessage(fullMessage.substring(0, 10000));
+		} else {
+			revision.setFullMessage(fullMessage);
+		}
+		revision.setCommitTime(new java.util.Date((long) curRevision.getCommitTime() * 1000));
+		return revision;
 	}
 
 }

@@ -29,27 +29,7 @@ class AnalyzeProjectsHandler extends RefactoringHandler {
 
 	@Override
 	public void handle(RevCommit curRevision, List<Refactoring> refactorings) {
-		RevisionGit revision = new RevisionGit();
-		revision.setProjectGit(db.getProjectById(project.getId()));
-		revision.setIdCommit(curRevision.getId().getName());
-		revision.setAuthorName(curRevision.getAuthorIdent().getName());
-		revision.setAuthorEmail(curRevision.getAuthorIdent().getEmailAddress());
-		revision.setCommitterName(curRevision.getCommitterIdent().getName());
-		revision.setCommitterEmail(curRevision.getCommitterIdent().getEmailAddress());
-		revision.setEncoding(curRevision.getEncoding().name());
-		revision.setIdCommitParent(curRevision.getParent(0).getId().getName());
-		if (curRevision.getShortMessage().length() >= 4999) {
-			revision.setShortMessage(curRevision.getShortMessage().substring(0, 4999));
-		} else {
-			revision.setShortMessage(curRevision.getShortMessage());
-		}
-		String fullMessage = curRevision.getFullMessage();
-		if (fullMessage.length() > 10000) {
-			revision.setFullMessage(fullMessage.substring(0, 10000));
-		} else {
-			revision.setFullMessage(fullMessage);
-		}
-		revision.setCommitTime(new java.util.Date((long) curRevision.getCommitTime() * 1000));
+		RevisionGit revision = RevisionGit.getFromRevCommit(curRevision, db.getProjectById(project.getId()));
 
 		Set<RefactoringGit> refactoringSet = new HashSet<RefactoringGit>();
 		for (Refactoring refactoring : refactorings) {

@@ -1,5 +1,18 @@
 package gr.uom.java.xmi.diff;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.refactoringminer.api.Refactoring;
+
 import gr.uom.java.xmi.UMLAttribute;
 import gr.uom.java.xmi.UMLClass;
 import gr.uom.java.xmi.UMLOperation;
@@ -8,19 +21,6 @@ import gr.uom.java.xmi.UMLType;
 import gr.uom.java.xmi.decomposition.Lambda;
 import gr.uom.java.xmi.decomposition.OperationInvocation;
 import gr.uom.java.xmi.decomposition.UMLOperationBodyMapper;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import org.refactoringminer.api.Refactoring;
 
 public class UMLClassDiff implements Comparable<UMLClassDiff> {
 	private UMLClass originalClass;
@@ -558,15 +558,19 @@ public class UMLClassDiff implements Comparable<UMLClassDiff> {
 	}
 
 	private Collection<? extends Lambda> compareLambdasToDetectAddedLambdas(List<Lambda> lambdasBefore, List<Lambda> lambdasAfter) {
-		Set<Lambda> matchedLambdasAfter = new HashSet<>(lambdasAfter);
-		Set<Lambda> matchedLambdasBefore = new HashSet<>(lambdasBefore);
+		Set<Lambda> matchedLambdasAfter = new LinkedHashSet<>(lambdasAfter);
+		Set<Lambda> matchedLambdasBefore = new LinkedHashSet<>(lambdasBefore);
 		matchedLambdasAfter.retainAll(lambdasBefore); // Remove everything which is not matched
 		matchedLambdasBefore.retainAll(lambdasAfter);
+		//final double SIMILARITY_THRESHOLD = 0.5;
 		for (Lambda lambdaAfter : lambdasAfter) {
 			if (!matchedLambdasAfter.contains(lambdaAfter)) {
 				for (Lambda lambdaBefore : lambdasBefore) {
 					if (!matchedLambdasBefore.contains(lambdaBefore)) {
-						if (lambdaAfter.getFunctionalInterfaceType().equals(lambdaBefore.getFunctionalInterfaceType())) {
+						
+						/*if (lambdaAfter.getParameterNames().size() == lambdaBefore.getParameterNames().size() &&
+								textuallySimilar(lambdaAfter.getBody(), lambdaBefore.getBody(), SIMILARITY_THRESHOLD)) {*/
+						if (lambdaAfter.getBody().equals(lambdaAfter.getBody())) {
 							matchedLambdasAfter.add(lambdaAfter);
 							matchedLambdasBefore.add(lambdaBefore);
 							break;
@@ -579,10 +583,6 @@ public class UMLClassDiff implements Comparable<UMLClassDiff> {
 		detectedAddedLambdas.removeAll(matchedLambdasAfter);
 		return detectedAddedLambdas;
 	}
-	
-	/*private boolean hasTheSameParameterTypes(Lambda lambda1, Lambda lambda2) {
-		return lambda1.getParameters().keySet().equals(lambda2.getParameters().keySet());
-	}*/
 
 	public List<Lambda> getAddedLambdas() {
 		return addedLambdas;
