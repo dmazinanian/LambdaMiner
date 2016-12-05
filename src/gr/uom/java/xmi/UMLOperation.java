@@ -9,6 +9,7 @@ import gr.uom.java.xmi.diff.StringDistance;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -322,6 +323,9 @@ public class UMLOperation implements Comparable<UMLOperation>, Serializable {
 	   }
 
 	public List<Lambda> getLambdas() {
-		return operationBody.getLambdas();
+		if (operationBody != null) {
+			return operationBody.getLambdas();
+		}
+		return Collections.emptyList();
 	}
 }
