@@ -3,6 +3,8 @@ package gr.uom.java.xmi.decomposition;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -12,6 +14,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class Lambda {
 
+	private final String containingFile;
 	private final String body;
 	private final int offset;
 	private final int length;
@@ -24,10 +27,11 @@ public class Lambda {
 	private final List<String> parameterNames;
 
 	public Lambda(LambdaExpression node) {
+		CompilationUnit compilationUnit = (CompilationUnit)node.getRoot();
 		body = node.getBody().toString();
 		offset = node.getStartPosition();
 		length = node.getLength();
-		CompilationUnit compilationUnit = (CompilationUnit)node.getRoot();
+		containingFile = getContainingFile(node);
 		lineStart = compilationUnit.getLineNumber(offset);
 		columnStart = compilationUnit.getColumnNumber(offset);
 		int endOffset = offset + length - 1;
@@ -65,6 +69,31 @@ public class Lambda {
 			parameterNames.add(parameterName);
 			parameterTypes.add(parameterTypeBindingKey);
 		}
+	}
+	
+	private String getContainingFile(LambdaExpression node) {
+		String containginFilePath = "";
+		CompilationUnit compilationUnit = (CompilationUnit)node.getRoot();
+		String packageName = compilationUnit.getPackage().getName().getFullyQualifiedName();
+		containginFilePath = packageName.replace(".", "/") + "/";
+		ASTNode parent = node.getParent();
+		AbstractTypeDeclaration candidateParent = null;
+		while (parent != null) {
+			if (parent instanceof AbstractTypeDeclaration) {
+				candidateParent = (AbstractTypeDeclaration)parent;
+			}
+			parent = parent.getParent();
+		}
+		if (candidateParent != null) {
+			containginFilePath += candidateParent.getName().getFullyQualifiedName() + ".java";
+		} else {
+			// We couldn't get the enclosing class, the lambda is out of a class? (e.g., in static context?!)
+		}
+		return containginFilePath;
+	}
+
+	public String getContainingFile() {
+		return containingFile;
 	}
 
 	public String getBody() {

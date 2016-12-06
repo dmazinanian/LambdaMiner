@@ -44,6 +44,9 @@ public class LambdaDBEntity extends AbstractEntity {
 	
 	@Column(columnDefinition="text")
 	private String body;
+	
+	@Column(columnDefinition="text")
+	private String filePath;
 
 	@Override
 	public Long getId() {
@@ -86,6 +89,14 @@ public class LambdaDBEntity extends AbstractEntity {
 		return body;
 	}
 	
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+
 	public Set<LambdaParametersDBEntity> getLambdaParameters() {
 		return lambdaParameters;
 	}
@@ -99,15 +110,11 @@ public class LambdaDBEntity extends AbstractEntity {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((body == null) ? 0 : body.hashCode());
-		result = prime * result + endColumn;
-		result = prime * result + endLine;
+		result = prime * result + ((filePath == null) ? 0 : filePath.hashCode());
 		result = prime * result + ((lambdaParameters == null) ? 0 : lambdaParameters.hashCode());
 		result = prime * result + length;
-		result = prime * result + numberOfParameters;
 		result = prime * result + offset;
 		result = prime * result + ((revision == null) ? 0 : revision.hashCode());
-		result = prime * result + startColumn;
-		result = prime * result + startLine;
 		return result;
 	}
 
@@ -125,9 +132,10 @@ public class LambdaDBEntity extends AbstractEntity {
 				return false;
 		} else if (!body.equals(other.body))
 			return false;
-		if (endColumn != other.endColumn)
-			return false;
-		if (endLine != other.endLine)
+		if (filePath == null) {
+			if (other.filePath != null)
+				return false;
+		} else if (!filePath.equals(other.filePath))
 			return false;
 		if (lambdaParameters == null) {
 			if (other.lambdaParameters != null)
@@ -136,8 +144,6 @@ public class LambdaDBEntity extends AbstractEntity {
 			return false;
 		if (length != other.length)
 			return false;
-		if (numberOfParameters != other.numberOfParameters)
-			return false;
 		if (offset != other.offset)
 			return false;
 		if (revision == null) {
@@ -145,14 +151,10 @@ public class LambdaDBEntity extends AbstractEntity {
 				return false;
 		} else if (!revision.equals(other.revision))
 			return false;
-		if (startColumn != other.startColumn)
-			return false;
-		if (startLine != other.startLine)
-			return false;
 		return true;
 	}
 
-	public static LambdaDBEntity getFromLambda(Lambda lambda, RevisionGit revisionGit) {
+	public static LambdaDBEntity getFromLambda(Lambda lambda, RevisionGit revisionGit, String fileContainingLambda) {
 		LambdaDBEntity lambdaDBEntity = new LambdaDBEntity();
 		lambdaDBEntity.revision = revisionGit;
 		lambdaDBEntity.offset = lambda.getOffset();
@@ -163,6 +165,8 @@ public class LambdaDBEntity extends AbstractEntity {
 		lambdaDBEntity.endColumn = lambda.getColumnEnd();
 		lambdaDBEntity.numberOfParameters = lambda.getParameterNames().size();
 		lambdaDBEntity.body = lambda.getBody();
+		lambdaDBEntity.filePath = lambda.getContainingFile();
+		lambdaDBEntity.filePath = fileContainingLambda;
 		Set<LambdaParametersDBEntity> lambdaParameters = new HashSet<>();
 		for (int i = 0; i < lambda.getParameterNames().size(); i++) {
 			String type = lambda.getParameterTypes().get(i);

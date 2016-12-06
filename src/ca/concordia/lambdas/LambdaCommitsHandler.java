@@ -38,13 +38,32 @@ public class LambdaCommitsHandler {
 		
 	}
 
-	public void handle(RevCommit currentCommit, List<Lambda> lambdasAtRevision) {
+	public void handle(RevCommit currentCommit, List<Lambda> lambdasAtRevision, List<String> filesCurrent) {
 		RevisionGit revisionGit = RevisionGit.getFromRevCommit(currentCommit, db.getProjectById(project.getId()));
 		Set<LambdaDBEntity> lambdas = 
 				lambdasAtRevision.stream()
-				.map(lambda -> LambdaDBEntity.getFromLambda(lambda, revisionGit)).collect(Collectors.toSet());
+				.map(lambda -> LambdaDBEntity.getFromLambda(lambda, revisionGit, getRealFileContainingLambda(filesCurrent, lambda)))
+				.collect(Collectors.toSet());
 		revisionGit.setLambdas(lambdas);
 		db.insert(revisionGit);
+	}
+
+	/*
+	 * Lambda keeps track of the file it is defined in.
+	 * However, the file path in Lambda#getContainingFile()
+	 * only includes the package name, in addition to the name of the
+	 * highest-level type, appended with ".java".
+	 * In case of nested src folders, etc, we need to map the file path
+	 * given from Git to the file path in Lambda.
+	 * The below approach is risky though, but should work in most of the cases
+	 */
+	private String getRealFileContainingLambda(List<String> filesCurrent, Lambda lambda) {
+		for (String path : filesCurrent) {
+			if (path.endsWith(lambda.getContainingFile())) {
+				return path;
+			}
+		}
+		return lambda.getContainingFile();
 	}
 
 }

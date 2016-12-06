@@ -95,7 +95,7 @@ public class LambdaMiner {
 			logger.info(String.format("Ignored revision %s with no changes in java files", commitId));
 			lambdasAtRevision = Collections.emptyList();
 		}
-		handler.handle(currentCommit, lambdasAtRevision);
+		handler.handle(currentCommit, lambdasAtRevision, filesCurrent);
 		return lambdasAtRevision;
 	}
 
