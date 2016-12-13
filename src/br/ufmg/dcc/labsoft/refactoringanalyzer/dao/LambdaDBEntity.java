@@ -48,6 +48,9 @@ public class LambdaDBEntity extends AbstractEntity {
 	@Column(columnDefinition="text")
 	private String filePath;
 
+	@Column(columnDefinition="text")
+	private String functionalInterfaceType;
+
 	@Override
 	public Long getId() {
 		return this.id;
@@ -105,16 +108,20 @@ public class LambdaDBEntity extends AbstractEntity {
 		this.lambdaParameters = lambdaParameters;
 	}
 	
+	public String getFunctionalInterfaceType() {
+		return this.functionalInterfaceType;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((body == null) ? 0 : body.hashCode());
 		result = prime * result + ((filePath == null) ? 0 : filePath.hashCode());
+		result = prime * result + ((functionalInterfaceType == null) ? 0 : functionalInterfaceType.hashCode());
 		result = prime * result + ((lambdaParameters == null) ? 0 : lambdaParameters.hashCode());
 		result = prime * result + length;
 		result = prime * result + offset;
-		result = prime * result + ((revision == null) ? 0 : revision.hashCode());
 		return result;
 	}
 
@@ -137,6 +144,11 @@ public class LambdaDBEntity extends AbstractEntity {
 				return false;
 		} else if (!filePath.equals(other.filePath))
 			return false;
+		if (functionalInterfaceType == null) {
+			if (other.functionalInterfaceType != null)
+				return false;
+		} else if (!functionalInterfaceType.equals(other.functionalInterfaceType))
+			return false;
 		if (lambdaParameters == null) {
 			if (other.lambdaParameters != null)
 				return false;
@@ -145,11 +157,6 @@ public class LambdaDBEntity extends AbstractEntity {
 		if (length != other.length)
 			return false;
 		if (offset != other.offset)
-			return false;
-		if (revision == null) {
-			if (other.revision != null)
-				return false;
-		} else if (!revision.equals(other.revision))
 			return false;
 		return true;
 	}
@@ -167,6 +174,7 @@ public class LambdaDBEntity extends AbstractEntity {
 		lambdaDBEntity.body = lambda.getBody();
 		lambdaDBEntity.filePath = lambda.getContainingFile();
 		lambdaDBEntity.filePath = fileContainingLambda;
+		lambdaDBEntity.functionalInterfaceType = lambda.getFunctionalInterfaceType();
 		Set<LambdaParametersDBEntity> lambdaParameters = new HashSet<>();
 		for (int i = 0; i < lambda.getParameterNames().size(); i++) {
 			String type = lambda.getParameterTypes().get(i);

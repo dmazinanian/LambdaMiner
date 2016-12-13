@@ -1,5 +1,6 @@
 package ca.concordia.lambdas;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,6 +26,7 @@ public class LambdaCommitsHandler {
 	public void onFinish(int refactoringsCount, int commitsCount, int errorCommitsCount) {
 		project.setAnalyzed(true);
 		project.setStatus("analyzed");
+		project.setLast_update(new Date());
 		db.update(project);
 	}
 
