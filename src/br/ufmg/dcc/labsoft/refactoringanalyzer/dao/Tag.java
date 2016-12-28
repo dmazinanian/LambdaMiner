@@ -10,6 +10,8 @@ import javax.persistence.Table;
 )
 public class Tag extends AbstractEntity {
 
+	private static final long serialVersionUID = 7492851875064021122L;
+
 	@Column(unique = true, length = 100)
 	private String label;
 

@@ -15,8 +15,8 @@ import gr.uom.java.xmi.decomposition.Lambda;
 
 public class LambdaCommitsHandler {
 
-	private final Database db;
-	private final ProjectGit project;
+	protected final Database db;
+	protected final ProjectGit project;
 
 	public LambdaCommitsHandler(Database db, ProjectGit project) {
 		this.db = db;
@@ -26,7 +26,6 @@ public class LambdaCommitsHandler {
 	public void onFinish(int refactoringsCount, int commitsCount, int errorCommitsCount) {
 		project.setAnalyzed(true);
 		project.setStatus("analyzed");
-		project.setLast_update(new Date());
 		db.update(project);
 	}
 
@@ -59,7 +58,7 @@ public class LambdaCommitsHandler {
 	 * given from Git to the file path in Lambda.
 	 * The below approach is risky though, but should work in most of the cases
 	 */
-	private String getRealFileContainingLambda(List<String> filesCurrent, Lambda lambda) {
+	protected String getRealFileContainingLambda(List<String> filesCurrent, Lambda lambda) {
 		for (String path : filesCurrent) {
 			if (path.endsWith(lambda.getContainingFile())) {
 				return path;

@@ -7,6 +7,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Index;
+
 @Entity
 @Table(name = "lambdaparameterstable", uniqueConstraints = {
 		@UniqueConstraint(columnNames = { "lambda", "type", "name" }) })
@@ -17,6 +19,7 @@ public class LambdaParametersDBEntity extends AbstractEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "lambda")
+	@Index(name="index_lambdaparameters_lambda")
 	private LambdaDBEntity lambda;
 
 	private String type;

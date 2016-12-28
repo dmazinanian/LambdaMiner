@@ -47,7 +47,7 @@ public class AnalyzeNewCommitsForLambdas extends TaskWithProjectLock {
 		Repository repo = gitService.cloneIfNotExists(projectFile.getPath(), project.getCloneUrl());
 
 		LambdaMiner detector = new LambdaMiner();
-		detector.fetchAndDetectNew(repo, new LambdaCommitsHandler(db1, project));
+		detector.fetchAndDetectNew(repo, new LambdaNewCommitsHandler(db1, project));
 		repo.close();
 	}
 }

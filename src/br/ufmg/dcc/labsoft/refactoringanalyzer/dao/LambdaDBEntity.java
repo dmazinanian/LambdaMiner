@@ -6,6 +6,8 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -23,6 +25,13 @@ import gr.uom.java.xmi.decomposition.Lambda;
 		@UniqueConstraint(columnNames = { "revision", "offset", "length" }) })
 public class LambdaDBEntity extends AbstractEntity {
 
+	public enum LambdaStatus {
+		NEW,
+		SKIPPED,
+		MAIL_SENT,
+		DONE
+	}
+
 	@Transient
 	private static final long serialVersionUID = 4524068566569180688L;
 
@@ -30,6 +39,9 @@ public class LambdaDBEntity extends AbstractEntity {
 	@JoinColumn(name = "revision")
 	@Index(name = "index_lambdastable_revision")
 	private RevisionGit revision;
+	
+	@OneToMany(mappedBy = "lambda", targetEntity = LambdaTagsDBEntity.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Set<LambdaTagsDBEntity> usertags;
 	
 	@OneToMany(mappedBy = "lambda", targetEntity = LambdaParametersDBEntity.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Set<LambdaParametersDBEntity> lambdaParameters;
@@ -50,6 +62,9 @@ public class LambdaDBEntity extends AbstractEntity {
 
 	@Column(columnDefinition="text")
 	private String functionalInterfaceType;
+	
+	@Enumerated(EnumType.STRING)
+	private LambdaStatus status;
 
 	@Override
 	public Long getId() {
@@ -184,6 +199,10 @@ public class LambdaDBEntity extends AbstractEntity {
 		}
 		lambdaDBEntity.setParameters(lambdaParameters);
 		return lambdaDBEntity;
+	}
+
+	public void setStatus(LambdaStatus status) {
+		this.status = status;
 	}
 
 }
