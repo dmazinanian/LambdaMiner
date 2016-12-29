@@ -21,6 +21,7 @@ public class User extends AbstractEntity {
 	private String name;
 	private String familyName;
 	private String password;
+	private String email;
 	@Enumerated(EnumType.STRING)
 	private UserRole userRole;
 
@@ -38,6 +39,10 @@ public class User extends AbstractEntity {
 
 	public String getPassword() {
 		return password;
+	}
+	
+	public String getEmail() {
+		return email;
 	}
 	
 	public UserRole getUserRole() {
