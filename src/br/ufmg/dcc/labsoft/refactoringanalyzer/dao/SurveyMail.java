@@ -31,11 +31,6 @@ public class SurveyMail extends AbstractEntity {
 	@Column(columnDefinition="TEXT")
 	private String body;
 	
-	@ManyToOne
-	@JoinColumn(name = "revision")
-	@Index(name="index_surveymail_revision")
-	private RevisionGit revision;
-	
 	@Override
 	public Long getId() {
 		return id;
@@ -68,14 +63,6 @@ public class SurveyMail extends AbstractEntity {
 
 	public void setBody(String body) {
 		this.body = body;
-	}
-
-	public RevisionGit getRevision() {
-		return revision;
-	}
-
-	public void setRevision(RevisionGit revision) {
-		this.revision = revision;
 	}
 
 	public String getAlternativeAddress() {

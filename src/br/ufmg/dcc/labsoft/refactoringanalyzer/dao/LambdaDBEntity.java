@@ -45,6 +45,9 @@ public class LambdaDBEntity extends AbstractEntity {
 	
 	@OneToMany(mappedBy = "lambda", targetEntity = LambdaParametersDBEntity.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Set<LambdaParametersDBEntity> lambdaParameters;
+	
+	@OneToMany(targetEntity = SurveyMail.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Set<SurveyMail> surveyEmails;
 
 	private int offset;
 	private int length;
