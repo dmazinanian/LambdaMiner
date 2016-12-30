@@ -19,6 +19,12 @@ public class SurveyMail extends AbstractEntity {
 	
 	@Index(name="index_surveymail_alternative")
 	private String alternativeAddress;
+	
+	@Index(name="index_surveymail_sender")
+	private String sender;
+	
+	@Column(length = 1024)
+	private String subject;
 
 	private Date sentDate;
 	
