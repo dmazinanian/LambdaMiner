@@ -14,6 +14,12 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class Lambda {
 
+	public enum LambdaLocationStatus {
+		IN_NEW_CLASS,
+		IN_NEW_METHOD,
+		IN_EXISTING_METHOD;
+	}
+
 	private final String containingFile;
 	private final String body;
 	private final int offset;
@@ -25,6 +31,7 @@ public class Lambda {
 	private final String functionalInterfaceType;
 	private final List<String> parameterTypes;
 	private final List<String> parameterNames;
+	private LambdaLocationStatus lambdaLocationStatus;
 
 	public Lambda(LambdaExpression node) {
 		CompilationUnit compilationUnit = (CompilationUnit)node.getRoot();
@@ -134,6 +141,14 @@ public class Lambda {
 	
 	public List<String> getParameterTypes() {
 		return parameterTypes;
+	}
+	
+	public void setLambdaLocationStatus(LambdaLocationStatus lambdaLocationStatus) {
+		this.lambdaLocationStatus = lambdaLocationStatus;
+	}
+	
+	public LambdaLocationStatus getLambdaLocationStatus() {
+		return this.lambdaLocationStatus;
 	}
 	
 	@Override

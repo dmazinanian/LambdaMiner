@@ -11,6 +11,7 @@ import gr.uom.java.xmi.UMLType;
 import gr.uom.java.xmi.decomposition.Lambda;
 import gr.uom.java.xmi.decomposition.OperationInvocation;
 import gr.uom.java.xmi.decomposition.UMLOperationBodyMapper;
+import gr.uom.java.xmi.decomposition.Lambda.LambdaLocationStatus;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -892,7 +893,10 @@ public class UMLModelDiff {
 		}
 		for (UMLClass umlClass : addedClasses) {
 			for (UMLOperation umlOperation : umlClass.getOperations()) {
-				addedLambdas.addAll(umlOperation.getLambdas());
+				umlOperation.getLambdas().forEach(lambda -> {
+					lambda.setLambdaLocationStatus(LambdaLocationStatus.IN_NEW_CLASS);
+					addedLambdas.add(lambda);
+				});
 			}
 		}
 	}

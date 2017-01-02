@@ -19,6 +19,7 @@ import gr.uom.java.xmi.UMLOperation;
 import gr.uom.java.xmi.UMLParameter;
 import gr.uom.java.xmi.UMLType;
 import gr.uom.java.xmi.decomposition.Lambda;
+import gr.uom.java.xmi.decomposition.Lambda.LambdaLocationStatus;
 import gr.uom.java.xmi.decomposition.OperationInvocation;
 import gr.uom.java.xmi.decomposition.UMLOperationBodyMapper;
 
@@ -544,16 +545,28 @@ public class UMLClassDiff implements Comparable<UMLClassDiff> {
 		for (UMLOperationBodyMapper umlOperationBodyMapper : operationBodyMapperList) {
 			List<Lambda> lambdasBefore = umlOperationBodyMapper.getOperation1().getLambdas();
 			List<Lambda> lambdasAfter = umlOperationBodyMapper.getOperation2().getLambdas();
-			addedLambdas.addAll(compareLambdasToDetectAddedLambdas(lambdasBefore, lambdasAfter));
+			Collection<? extends Lambda> newLambdas = compareLambdasToDetectAddedLambdas(lambdasBefore, lambdasAfter);
+			newLambdas.forEach(lambda -> {
+				lambda.setLambdaLocationStatus(LambdaLocationStatus.IN_EXISTING_METHOD);
+				addedLambdas.add(lambda);
+			});
 			
 		}
 		for (UMLOperationDiff umlOperationDiff : operationDiffList) {
 			List<Lambda> lambdasBefore = umlOperationDiff.getRemovedOperation().getLambdas();
 			List<Lambda> lambdasAfter = umlOperationDiff.getAddedOperation().getLambdas();
-			addedLambdas.addAll(compareLambdasToDetectAddedLambdas(lambdasBefore, lambdasAfter));
+			Collection<? extends Lambda> newLambdas = compareLambdasToDetectAddedLambdas(lambdasBefore, lambdasAfter);
+			newLambdas.forEach(lambda -> {
+				lambda.setLambdaLocationStatus(LambdaLocationStatus.IN_EXISTING_METHOD);
+				addedLambdas.add(lambda);
+			});
 		}
 		for (UMLOperation umlOperation : addedOperations) {
-			addedLambdas.addAll(umlOperation.getLambdas());
+			umlOperation.getLambdas().forEach(lambda -> {
+				lambda.setLambdaLocationStatus(LambdaLocationStatus.IN_NEW_METHOD);
+				addedLambdas.add(lambda);
+			});
+			
 		}
 	}
 

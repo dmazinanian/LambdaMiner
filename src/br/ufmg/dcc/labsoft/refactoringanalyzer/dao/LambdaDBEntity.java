@@ -19,6 +19,7 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.Index;
 
 import gr.uom.java.xmi.decomposition.Lambda;
+import gr.uom.java.xmi.decomposition.Lambda.LambdaLocationStatus;
 
 @Entity
 @Table(name = "lambdastable", uniqueConstraints = {
@@ -68,6 +69,9 @@ public class LambdaDBEntity extends AbstractEntity {
 	
 	@Enumerated(EnumType.STRING)
 	private LambdaStatus status;
+	
+	@Enumerated(EnumType.STRING)
+	private LambdaLocationStatus lambdaLocationStatus;
 
 	@Override
 	public Long getId() {
@@ -193,6 +197,7 @@ public class LambdaDBEntity extends AbstractEntity {
 		lambdaDBEntity.filePath = lambda.getContainingFile();
 		lambdaDBEntity.filePath = fileContainingLambda;
 		lambdaDBEntity.functionalInterfaceType = lambda.getFunctionalInterfaceType();
+		lambdaDBEntity.lambdaLocationStatus = lambda.getLambdaLocationStatus();
 		Set<LambdaParametersDBEntity> lambdaParameters = new HashSet<>();
 		for (int i = 0; i < lambda.getParameterNames().size(); i++) {
 			String type = lambda.getParameterTypes().get(i);
@@ -206,6 +211,14 @@ public class LambdaDBEntity extends AbstractEntity {
 
 	public void setStatus(LambdaStatus status) {
 		this.status = status;
+	}
+
+	public LambdaLocationStatus getLambdaLocationStatus() {
+		return lambdaLocationStatus;
+	}
+
+	public void setLambdaLocationStatus(LambdaLocationStatus lambdaLocationStatus) {
+		this.lambdaLocationStatus = lambdaLocationStatus;
 	}
 
 }
