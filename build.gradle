@@ -34,7 +34,7 @@ dependencies {
 	compile 'com.fasterxml.jackson.core:jackson-core:2.8.4'
 	compile 'com.fasterxml.jackson.core:jackson-databind:2.8.4'
 	compile 'com.fasterxml.jackson.core:jackson-annotations:2.8.4'
-	compile 'mysql:mysql-connector-java:6.0.5'
+	compile 'mysql:mysql-connector-java:5.1.40'
 	
 	compile files('lib/org.eclipse.core.commands_3.7.0.v20150422-0725.jar')
 	compile files('lib/org.eclipse.core.contenttype_3.5.0.v20150421-2214.jar')
