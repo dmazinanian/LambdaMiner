@@ -18,6 +18,8 @@ public class LambdaNewCommitsHandler extends LambdaCommitsHandler {
 
 	public LambdaNewCommitsHandler(Database db, ProjectGit project) {
 		super(db, project);
+		project.setStatus("analyzing");
+		db.update(project);
 	}
 	
 	@Override
@@ -38,6 +40,7 @@ public class LambdaNewCommitsHandler extends LambdaCommitsHandler {
 	@Override
 	public void onFinish(int refactoringsCount, int commitsCount, int errorCommitsCount) {
 		project.setLast_update(new Date());
+		project.setStatus("analyzed");
 		db.update(project);
 	}
 
