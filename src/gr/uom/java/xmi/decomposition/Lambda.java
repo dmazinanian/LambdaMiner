@@ -32,12 +32,14 @@ public class Lambda {
 	private final List<String> parameterTypes;
 	private final List<String> parameterNames;
 	private LambdaLocationStatus lambdaLocationStatus;
+	private final String parentString;
 
 	public Lambda(LambdaExpression node) {
 		CompilationUnit compilationUnit = (CompilationUnit)node.getRoot();
 		body = node.getBody().toString();
 		offset = node.getStartPosition();
 		length = node.getLength();
+		parentString = node.getParent().getParent().toString();
 		containingFile = getContainingFile(node);
 		lineStart = compilationUnit.getLineNumber(offset);
 		columnStart = compilationUnit.getColumnNumber(offset);
@@ -77,7 +79,7 @@ public class Lambda {
 			parameterTypes.add(parameterTypeBindingKey);
 		}
 	}
-	
+
 	private String getContainingFile(LambdaExpression node) {
 		String containginFilePath = "";
 		CompilationUnit compilationUnit = (CompilationUnit)node.getRoot();
@@ -149,6 +151,10 @@ public class Lambda {
 	
 	public LambdaLocationStatus getLambdaLocationStatus() {
 		return this.lambdaLocationStatus;
+	}
+	
+	public String getParentString() {
+		return parentString;
 	}
 	
 	@Override
