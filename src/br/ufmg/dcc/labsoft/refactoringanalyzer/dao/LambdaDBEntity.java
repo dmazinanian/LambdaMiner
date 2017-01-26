@@ -72,6 +72,8 @@ public class LambdaDBEntity extends AbstractEntity {
 	
 	@Enumerated(EnumType.STRING)
 	private LambdaLocationStatus lambdaLocationStatus;
+	
+	private String parent;
 
 	@Override
 	public Long getId() {
@@ -132,6 +134,14 @@ public class LambdaDBEntity extends AbstractEntity {
 	
 	public String getFunctionalInterfaceType() {
 		return this.functionalInterfaceType;
+	}
+	
+	public void setParent(String parent) {
+		this.parent = parent;
+	}
+	
+	public String getParent() {
+		return this.parent;
 	}
 	
 	@Override
@@ -198,6 +208,7 @@ public class LambdaDBEntity extends AbstractEntity {
 		lambdaDBEntity.filePath = fileContainingLambda;
 		lambdaDBEntity.functionalInterfaceType = lambda.getFunctionalInterfaceType();
 		lambdaDBEntity.lambdaLocationStatus = lambda.getLambdaLocationStatus();
+		lambdaDBEntity.parent = lambda.getParentString();
 		Set<LambdaParametersDBEntity> lambdaParameters = new HashSet<>();
 		for (int i = 0; i < lambda.getParameterNames().size(); i++) {
 			String type = lambda.getParameterTypes().get(i);
