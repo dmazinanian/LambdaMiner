@@ -75,6 +75,8 @@ public class LambdaDBEntity extends AbstractEntity {
 	
 	private String parent;
 
+	private String lambdaString;
+
 	@Override
 	public Long getId() {
 		return this.id;
@@ -144,6 +146,14 @@ public class LambdaDBEntity extends AbstractEntity {
 		return this.parent;
 	}
 	
+	public void setLambdaString(String lambdaString) {
+		this.lambdaString = lambdaString;
+	}
+	
+	public String getLambdaString() {
+		return this.lambdaString;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -209,6 +219,7 @@ public class LambdaDBEntity extends AbstractEntity {
 		lambdaDBEntity.functionalInterfaceType = lambda.getFunctionalInterfaceType();
 		lambdaDBEntity.lambdaLocationStatus = lambda.getLambdaLocationStatus();
 		lambdaDBEntity.parent = lambda.getParentString();
+		lambdaDBEntity.lambdaString = lambda.getLambdaString();
 		Set<LambdaParametersDBEntity> lambdaParameters = new HashSet<>();
 		for (int i = 0; i < lambda.getParameterNames().size(); i++) {
 			String type = lambda.getParameterTypes().get(i);

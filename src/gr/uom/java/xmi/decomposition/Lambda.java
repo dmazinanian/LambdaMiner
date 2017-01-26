@@ -33,13 +33,15 @@ public class Lambda {
 	private final List<String> parameterNames;
 	private LambdaLocationStatus lambdaLocationStatus;
 	private final String parentString;
+	private final String lambdaString;
 
 	public Lambda(LambdaExpression node) {
 		CompilationUnit compilationUnit = (CompilationUnit)node.getRoot();
 		body = node.getBody().toString();
 		offset = node.getStartPosition();
 		length = node.getLength();
-		parentString = node.getParent().getParent().toString();
+		parentString = node.getParent().toString();
+		lambdaString = node.toString();
 		containingFile = getContainingFile(node);
 		lineStart = compilationUnit.getLineNumber(offset);
 		columnStart = compilationUnit.getColumnNumber(offset);
@@ -157,6 +159,10 @@ public class Lambda {
 		return parentString;
 	}
 	
+	public String getLambdaString() {
+		return lambdaString;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
