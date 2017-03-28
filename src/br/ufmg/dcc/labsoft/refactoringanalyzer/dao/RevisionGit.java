@@ -36,6 +36,8 @@ public class RevisionGit extends AbstractEntity {
 	private String authorEmail;               
 	private String encoding;                
 	private Date commitTime;
+	private int linesAdded;
+	private int linesRemoved;
 
 	private Boolean mentionsRefactoring;
 	private Boolean describesRefactoring;
@@ -207,6 +209,22 @@ public class RevisionGit extends AbstractEntity {
 	
 	public Set<LambdaDBEntity> getLambdas() {
 		return lambdas;
+	}
+	
+	public void setLinesAdded(int linesAdded) {
+		this.linesAdded = linesAdded;
+	}
+	
+	public int getLinesAdded() {
+		return this.linesAdded;
+	}
+	
+	public void setLinesRemoved(int linesRemoved) {
+		this.linesRemoved = linesRemoved;
+	}
+	
+	public int getLinesRemoved() {
+		return this.linesRemoved;
 	}
 
 	public static RevisionGit getFromRevCommit(RevCommit curRevision, ProjectGit project) {

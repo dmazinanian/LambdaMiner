@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.refactoringminer.api.Churn;
 
 import br.ufmg.dcc.labsoft.refactoringanalyzer.dao.Database;
 import br.ufmg.dcc.labsoft.refactoringanalyzer.dao.LambdaDBEntity;
@@ -39,13 +40,15 @@ public class LambdaCommitsHandler {
 		
 	}
 
-	public void handle(RevCommit currentCommit, List<Lambda> lambdasAtRevision, List<String> filesCurrent) {
+	public void handle(RevCommit currentCommit, List<Lambda> lambdasAtRevision, List<String> filesCurrent, Churn churn) {
 		RevisionGit revisionGit = RevisionGit.getFromRevCommit(currentCommit, db.getProjectById(project.getId()));
 		Set<LambdaDBEntity> lambdas = 
 				lambdasAtRevision.stream()
 				.map(lambda -> LambdaDBEntity.getFromLambda(lambda, revisionGit, getRealFileContainingLambda(filesCurrent, lambda)))
 				.collect(Collectors.toSet());
 		revisionGit.setLambdas(lambdas);
+		revisionGit.setLinesAdded(churn.getLinesAdded());
+		revisionGit.setLinesRemoved(churn.getLinesRemoved());
 		db.insert(revisionGit);
 	}
 
