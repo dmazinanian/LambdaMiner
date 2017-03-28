@@ -11,12 +11,17 @@ import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffEntry.ChangeType;
+import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.diff.Edit;
+import org.eclipse.jgit.diff.Edit.Type;
 import org.eclipse.jgit.diff.RenameDetector;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
+import org.eclipse.jgit.patch.FileHeader;
+import org.eclipse.jgit.patch.HunkHeader;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.revwalk.RevWalkUtils;
@@ -24,6 +29,8 @@ import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.eclipse.jgit.transport.FetchResult;
 import org.eclipse.jgit.transport.TrackingRefUpdate;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
+import org.eclipse.jgit.util.io.DisabledOutputStream;
+import org.refactoringminer.api.Churn;
 import org.refactoringminer.api.GitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -320,4 +327,66 @@ public class GitServiceImpl implements GitService {
 	private boolean isJavafile(String path) {
 		return path.endsWith(".java");
 	}
+
+	@Override
+	public Churn getChurn(RevCommit currentCommit, RevCommit parentCommit, Repository repository) throws Exception {
+		ObjectId oldHead = parentCommit.getTree();
+        ObjectId head = currentCommit.getTree();
+
+        // prepare the two iterators to compute the diff between
+		ObjectReader reader = repository.newObjectReader();
+		CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
+		oldTreeIter.reset(reader, oldHead);
+		CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
+		newTreeIter.reset(reader, head);
+		// finally get the list of changed files
+		List<DiffEntry> diffs = new Git(repository).diff()
+		                    .setNewTree(newTreeIter)
+		                    .setOldTree(oldTreeIter)
+		                    .setShowNameAndStatusOnly(true)
+		                    .call();
+		
+		DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
+		diffFormatter.setRepository(repository);
+		diffFormatter.setContext( 0 );
+		int addedLines = 0;
+		int deletedLines = 0;
+        for (DiffEntry entry : diffs) {
+			FileHeader header = diffFormatter.toFileHeader(entry);
+        	List<? extends HunkHeader> hunks = header.getHunks();
+        	for (HunkHeader hunkHeader : hunks) {
+        		for (Edit edit : hunkHeader.toEditList()) {
+					if (edit.getType() == Type.INSERT) {
+						addedLines += edit.getLengthB();
+					} else if (edit.getType() == Type.DELETE) {
+						deletedLines += edit.getLengthB();
+					} else if (edit.getType() == Type.REPLACE) {
+						deletedLines += edit.getLengthA();
+						addedLines += edit.getLengthB();
+					}
+				}
+        	}
+        	
+        	/*ChangeType changeType = entry.getChangeType();
+        	if (changeType != ChangeType.ADD) {
+        		String oldPath = entry.getOldPath();
+        		if (isJavafile(oldPath)) {
+        			//javaFilesBefore.add(oldPath);
+        		}
+        	}
+    		if (changeType != ChangeType.DELETE) {
+        		String newPath = entry.getNewPath();
+        		if (isJavafile(newPath)) {
+        			//javaFilesCurrent.add(newPath);
+        			if (changeType == ChangeType.RENAME) {
+        				String oldPath = entry.getOldPath();
+        				//renamedFilesHint.put(oldPath, newPath);
+        			}
+        		}
+    		}*/
+        }
+        diffFormatter.close();
+        return new Churn(addedLines, deletedLines);
+	}
+	
 }

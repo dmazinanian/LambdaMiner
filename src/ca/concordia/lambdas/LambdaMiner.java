@@ -11,6 +11,7 @@ import java.util.Map;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.refactoringminer.api.Churn;
 import org.refactoringminer.api.GitService;
 import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
 import org.refactoringminer.util.GitServiceImpl;
@@ -95,7 +96,8 @@ public class LambdaMiner {
 			logger.info(String.format("Ignored revision %s with no changes in java files", commitId));
 			lambdasAtRevision = Collections.emptyList();
 		}
-		handler.handle(currentCommit, lambdasAtRevision, filesCurrent);
+		Churn churn = gitService.getChurn(currentCommit, currentCommit.getParent(0), repository);
+		handler.handle(currentCommit, lambdasAtRevision, filesCurrent, churn);
 		return lambdasAtRevision;
 	}
 
