@@ -1,104 +1,89 @@
-# RefactoringMiner
-RefactoringMiner is a library/API written in Java that can detect refactorings applied in the history of a Java project.
+# LambdaMiner
 
-Currently, it supports the detection of the following refactorings:
+LambdaMiner is a fork for [RefactoringMiner](https://github.com/tsantalis/RefactoringMiner).
+While RefactoringMiner is used to detect refactorings in the history of Java projects,
+LambdaMiner is used for identifying newly-introduced lambda expressions in Java code.
+We used this tool for conducting a study on how Java developers take advantage of 
+lambda expressions in their code. 
 
-1. Extract Method
-2. Inline Method
-3. Move Method/Attribute
-4. Pull Up Method/Attribute
-5. Push Down Method/Attribute
-6. Extract Superclass/Interface
-7. Move Class
-8. Rename Class
-9. Rename Method
+## Installation
 
-In order to build the project, run `./gradlew jar` (or `gradlew jar`, in Windows) in the project's root directory.
-Alternatively, you can generate a complete distribution zip including all runtime dependencies running `./gradlew distZip`.
+1. Clone or download [**LambdaMiner**](https://github.com/dmazinanian/LambdaMiner){:target='_blank'}.
 
-You can also work with the project with Eclipse IDE. First, run `./gradlew eclipse` to generate Eclipse project metadata files. Then, import it into Eclipse using the *Import Existing Project* feature.
+2. Import **LambdMiner** to Eclipse (it is easily possible to create a standalone
+configuration as well, we will provide it later).
+For that, first you will need to run the command `gradlew eclipse` in the 
+project's folder (`./gradlew eclipse` on posix-compliant systems).
+After the downloading of the necessary dependencies is finished,
+open Eclipse, and use the `File > Import > General > Existing Projects into Workspace`.
+Select the project's folder and click Finish to import **LambdaMiner** into eclipse.
 
-## Contributors ##
-The code in package **gr.uom.java.xmi.*** has been developed by [Nikolaos Tsantalis](https://github.com/tsantalis).
+3. **LambdaMiner** needs a database engine to write the extracted data to.
+We used MySQL, while you are free to use whatever engine that you like. 
+You will need to configure the `src/META_INF/persistence.xml` file accordingly.
+You can download a sample `persistence.xml` file from [here](https://www.dropbox.com/s/wqp0gx0j4v0j43m/persistence.xml){:target='_blank'}.
+Make sure to provide the correct server address/username/password for the 
+database in this file.
 
-The code in package **br.ufmg.dcc.labsoft.refactoringanalyzer.*** and **org.refactoringminer.*** has been developed by [Danilo Ferreira e Silva](https://github.com/danilofes).
+4. Make a database named `lambda-study` in your database server
+(this name can be changed in the `persistence.xml` if necessary).
 
-## API usage guidelines ##
+5. If you want to automatically fetch the top 1000 projects from GitHub
+(ranked by stargazers count) into the database, follow this step.
 
-RefactoringMiner can automatically detect refactorings in the entire history of 
-git repositories, or at specified commits.
-In the code snippet below we demonstrate how to print all refactorings performed
-in the toy project https://github.com/danilofes/refactoring-toy-example.git.
+    **Note**: *You can manually enter the information about the projects of interest
+to the database and skip this step.
+To this aim, go to step 6 and run the tool once so that the necessary tables
+are created into the database.
+Then enter the necessary data to the `projectsgit` table*.
 
-```java
-GitService gitService = new GitServiceImpl();
-GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
+    Make a run configuration in Eclipse for running **LambdaMiner**
+with the main class `br.ufmg.dcc.labsoft.refactoringanalyzer.operations.GitProjectFinder`.
+You should provide your GitHub user name and password as the program input arguments 
+(space separated).
+Not that, your user name and password will not be sent,
+it's just your run configuration for Eclipse saved on your local Eclipse workspace
+(you can check the class `GitProjectFinder` to see what we are doing with your
+credentials).
 
-Repository repo = gitService.cloneIfNotExists(
-    "tmp/refactoring-toy-example",
-    "https://github.com/danilofes/refactoring-toy-example.git");
+    In the database, a table named `projectsgit` will be created after this step. 
 
-miner.detectAll(repo, "master", new RefactoringHandler() {
-  @Override
-  public void handle(RevCommit commitData, List<Refactoring> refactorings) {
-    System.out.println("Refactorings at " + commitData.getId().getName());
-    for (Refactoring ref : refactorings) {
-      System.out.println(ref.toString());
-    }
-  }
-});
-```
+6. Make a run configuration in Eclipse for running **LambdaMiner**
+and detecting lambdas.
+There are two modes for the tool:
 
-It is possible to analyze a specifc commit using `detectAtCommit` instead of `detectAll`. The commit
-is identified by its SHA key, such as in the example below:
+    A. Detecting **all the lambda expressions** in the history
+    of software systems. 
+    To do this, run the tool with the with the main class
+    `ca.concordia.lambdas.AnalyzeProjectsForLambda`.
+    You should mark the projects that you want to be analyzed in the database
+    by setting the value of the `analyzed` column to 0
+    and the `status` column to `pending` for those projects.
 
-```java
-miner.detectAtCommit(repo, "05c1e773878bbacae64112f70964f4f2f7944398", new RefactoringHandler() {
-  @Override
-  public void handle(RevCommit commitData, List<Refactoring> refactorings) {
-    System.out.println("Refactorings at " + commitData.getId().getName());
-    for (Refactoring ref : refactorings) {
-      System.out.println(ref.toString());
-    }
-  }
-});
-```
+    B. Detecting **only new lambda expressions** from the last time that the tool
+    is run.
+    Run the tool with the main class `ca.concordia.lambdas.AnalyzeNewCommitsForLambdas` 
+    for this mode.
+    You should select which projects you want to be monitored for lambdas,
+    by setting the value of the `monitoring_enabled` column to 1 for those projects.
 
-There is also a lower level API that works comparing the source code from two
-folders that contain the code before and after the code changes:  
+    In both cases, the program should be run with one argument, 
+    which is the path to which the repositories will be cloned.
 
-```java
-UMLModel model1 = new ASTReader(new File("/path/to/version1/")).getUmlModel();
-UMLModel model2 = new ASTReader(new File("/path/to/version2/")).getUmlModel();
-UMLModelDiff modelDiff = model1.diff(model2);
-List<Refactoring> refactorings = modelDiff.getRefactorings();
-```
+**ACKNOWLEDGEMENT**: *We used the existing data-access logic in **RefactoringMiner**
+which was developed by [Danilo Silva](https://github.com/danilofes).*
 
-Note that by doing this you may get different results from the git history analysis, because
-it uses information from git to better identify moves and renames.
+### LambdaMiner Output
 
+The following tables are created in the database when running **LambdaMiner**:
 
-## Running from the command line ##
+Table Name | Description
+---|---
+ `projectgit` | Info about the projects under analysis
+ `revisiongit` | Info about each revision of each analyzed project
+ `lambdastable` | Info about each lambda expression found in each revision
+ `lambdaparameterstable` | Info about each parameter for each lambda expression
+ {: .table .table-striped }
 
-When you build a distributable application with `./gradlew distZip`, you can run Refactoring Miner as a command line application. Extract the file under `build/distribution/RefactoringMiner.zip` in the desired location, and cd into the `bin` folder (or include it in your path). Them, run RefactoringMiner using the following syntax:
-
-    > RefactoringMiner <path-to-git-repo> <commit-sha1>
-
-For example, supose that you run:
-
-    > git clone https://github.com/danilofes/refactoring-toy-example.git refactoring-toy-example
-    > RefactoringMiner refactoring-toy-example 36287f7c3b09eff78395267a3ac0d7da067863fd
-
-The output would be:
-
-    4 refactorings found in commit 36287f7c3b09eff78395267a3ac0d7da067863fd:
-      Pull Up Attribute     private age : int from class org.animals.Labrador to class org.animals.Dog
-      Pull Up Attribute     private age : int from class org.animals.Poodle to class org.animals.Dog
-      Pull Up Method        public getAge() : int from class org.animals.Labrador to public getAge() : int from class org.animals.Dog
-      Pull Up Method        public getAge() : int from class org.animals.Poodle to public getAge() : int from class org.animals.Dog
-
-
-## Research ##
-
-RefactoringMiner has been used in the following papers:
-* Danilo Silva, Nikolaos Tsantalis, and Marco Tulio Valente, "[Why We Refactor? Confessions of GitHub Contributors](http://arxiv.org/pdf/1607.02459v1)," *24th ACM SIGSOFT International Symposium on the Foundations of Software Engineering* (FSE'2016), Seattle, WA, USA, November 13-18, 2016.
+We used a dump of the database created after running the tool 
+to generate CSV files and fulfill the analysis in R.
