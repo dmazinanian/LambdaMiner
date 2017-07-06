@@ -8,7 +8,7 @@ lambda expressions in their code.
 
 ## Installation
 
-1. Clone or download [**LambdaMiner**](https://github.com/dmazinanian/LambdaMiner){:target='_blank'}.
+1. Clone or download [**LambdaMiner**](https://github.com/dmazinanian/LambdaMiner).
 
 2. Import **LambdMiner** to Eclipse (it is easily possible to create a standalone
 configuration as well, we will provide it later).
@@ -21,7 +21,7 @@ Select the project's folder and click Finish to import **LambdaMiner** into ecli
 3. **LambdaMiner** needs a database engine to write the extracted data to.
 We used MySQL, while you are free to use whatever engine that you like. 
 You will need to configure the `src/META_INF/persistence.xml` file accordingly.
-You can download a sample `persistence.xml` file from [here](https://www.dropbox.com/s/wqp0gx0j4v0j43m/persistence.xml){:target='_blank'}.
+You can download a sample `persistence.xml` file from [here](https://www.dropbox.com/s/wqp0gx0j4v0j43m/persistence.xml).
 Make sure to provide the correct server address/username/password for the 
 database in this file.
 
@@ -83,7 +83,6 @@ Table Name | Description
  `revisiongit` | Info about each revision of each analyzed project
  `lambdastable` | Info about each lambda expression found in each revision
  `lambdaparameterstable` | Info about each parameter for each lambda expression
- {: .table .table-striped }
 
 We used a dump of the database created after running the tool 
 to generate CSV files and fulfill the analysis in R.
